@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+  body {
+    @apply bg-slate-50 text-slate-800 font-sans transition-colors duration-300;
+    @apply dark:bg-slate-950 dark:text-slate-100;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary-600/25 transition;
+    @apply hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+    @apply dark:shadow-primary-900/40 dark:focus:ring-offset-slate-900;
+  }
+  .card {
+    @apply rounded-2xl border border-slate-100 bg-white p-6 shadow-card transition-colors duration-300;
+    @apply dark:border-slate-700/80 dark:bg-slate-800/90 dark:shadow-card-dark dark:ring-1 dark:ring-slate-700/40;
+  }
+  .input-field {
+    @apply w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm transition;
+    @apply focus:border-primary-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-100;
+    @apply dark:border-slate-600 dark:bg-slate-900/70 dark:text-slate-100 dark:placeholder:text-slate-500;
+    @apply dark:focus:border-primary-500 dark:focus:bg-slate-900 dark:focus:ring-primary-900/40;
+  }
+  /* Alias utilisé dans certaines vues */
+  .input {
+    @apply input-field;
+  }
+
+  .page-title {
+    @apply font-display text-3xl font-bold text-slate-900 dark:text-white;
+  }
+  .page-subtitle {
+    @apply mt-1 text-slate-500 dark:text-slate-400;
+  }
+  .table-head {
+    @apply bg-slate-50 dark:bg-slate-800/80;
+  }
+  .table-row {
+    @apply border-t border-slate-100 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800/50;
+  }
+}
+
+@layer utilities {
+  .app-shell {
+    @apply min-h-screen bg-gradient-to-br from-slate-50 via-primary-50/30 to-slate-100 transition-colors duration-300;
+    @apply dark:from-slate-950 dark:via-slate-900 dark:to-slate-950;
+  }
+  .app-sidebar {
+    @apply border-r border-white/60 bg-white/80 backdrop-blur-xl transition-colors duration-300;
+    @apply dark:border-slate-700/60 dark:bg-slate-900/95;
+  }
+  .patient-shell {
+    @apply min-h-screen bg-gradient-to-br from-teal-50/80 via-white to-slate-50 transition-colors duration-300;
+    @apply dark:from-slate-950 dark:via-slate-900 dark:to-slate-950;
+  }
+  .patient-sidebar {
+    @apply border-r border-teal-100 bg-white/90 backdrop-blur-xl transition-colors duration-300;
+    @apply dark:border-slate-700 dark:bg-slate-900/95;
+  }
+  .admin-main {
+    @apply min-h-screen flex-1 bg-slate-100 p-8 transition-colors duration-300;
+    @apply dark:bg-slate-950;
+  }
+}

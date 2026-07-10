@@ -1,0 +1,34 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.env
+db.sqlite3
+media/
+staticfiles/
+.pytest_cache/
+.coverage
+htmlcov/
+node_modules/
+dist/
+.DS_Store
+*.log
+.idea/
+.vscode/
+
+# Flutter / mobile
+mobile/.dart_tool/
+mobile/build/
+mobile/.flutter-plugins-dependencies
+mobile/.packages
+mobile/.pub-cache/
+mobile/.pub/
+mobile/**/Generated.xcconfig
+mobile/**/flutter_export_environment.sh
+
+# OS / editor
+Thumbs.db
+*.swp
+*.swo
