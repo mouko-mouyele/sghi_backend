@@ -15,6 +15,9 @@ pip install -r requirements.txt
 echo "Running Django migrations..."
 python manage.py migrate
 
+echo "Seeding demo users and hospital data..."
+python manage.py seed_demo
+
 echo "Collecting static files..."
 python manage.py collectstatic --noinput
 

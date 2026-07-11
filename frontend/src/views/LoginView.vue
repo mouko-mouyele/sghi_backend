@@ -153,7 +153,7 @@ async function handleLogin() {
     await router.replace(getHomeRoute(data.role))
 
   } catch (e) {
-    error.value = parseApiError(e, 'Identifiants incorrects ou envoi du code impossible')
+    error.value = parseApiError(e, 'Connexion impossible — vérifiez identifiant/mot de passe ou la configuration email (MFA)')
 
   } finally {
 
