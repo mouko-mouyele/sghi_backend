@@ -11,6 +11,7 @@ class LoginResult {
   final bool requiresMfa;
   final String pendingToken;
   final String mfaHint;
+  final String mfaScreenCode;
   final String role;
   final int mfaExpiresIn;
 
@@ -21,6 +22,7 @@ class LoginResult {
     this.requiresMfa = false,
     this.pendingToken = '',
     this.mfaHint = '',
+    this.mfaScreenCode = '',
     this.role = '',
     this.mfaExpiresIn = 300,
   });
@@ -31,12 +33,14 @@ class LoginResult {
     required String pendingToken,
     required String mfaHint,
     required String role,
+    String mfaScreenCode = '',
     int mfaExpiresIn = 300,
   }) =>
       LoginResult._(
         requiresMfa: true,
         pendingToken: pendingToken,
         mfaHint: mfaHint,
+        mfaScreenCode: mfaScreenCode,
         role: role,
         mfaExpiresIn: mfaExpiresIn,
       );
@@ -87,6 +91,7 @@ class ApiService {
           return LoginResult.mfaRequired(
             pendingToken: data['pending_token'] as String? ?? '',
             mfaHint: data['mfa_hint'] as String? ?? 'Consultez votre boîte mail',
+            mfaScreenCode: data['mfa_dev_code'] as String? ?? '',
             role: data['role'] as String? ?? '',
             mfaExpiresIn: data['mfa_expires_in'] as int? ?? 300,
           );

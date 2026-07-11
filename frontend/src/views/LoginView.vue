@@ -128,6 +128,14 @@ function normalizeMfaInput(raw) {
 
 
 
+function useScreenMfaCode() {
+  if (!mfaDevCode.value || mfaExpired.value) return
+  mfaCode.value = mfaDevCode.value
+  error.value = ''
+}
+
+
+
 async function handleLogin() {
 
   loading.value = true
@@ -315,10 +323,17 @@ function backToPassword() {
 
 
         <form v-else class="mt-8 space-y-5" @submit.prevent="handleMfa">
-          <div v-if="mfaDevCode" class="rounded-xl border-2 border-dashed border-amber-400 bg-amber-50 px-4 py-3 text-center dark:bg-amber-950/40">
-            <p class="text-xs font-medium text-amber-800 dark:text-amber-200">Mode développement — code actif côté serveur</p>
-            <p class="mt-1 font-mono text-3xl font-bold tracking-[0.3em] text-amber-900 dark:text-amber-100">{{ mfaDevCode }}</p>
-            <p class="mt-1 text-xs text-amber-700 dark:text-amber-300">Copiez ce code si l'email tarde ou si plusieurs mails sont arrivés</p>
+          <div v-if="mfaDevCode" class="rounded-xl border-2 border-teal-400 bg-teal-50 px-4 py-4 text-center dark:bg-teal-950/40">
+            <p class="text-sm font-medium text-teal-900 dark:text-teal-100">Code de vérification — aussi envoyé par email</p>
+            <p class="mt-2 font-mono text-4xl font-bold tracking-[0.35em] text-teal-800 dark:text-teal-100">{{ mfaDevCode }}</p>
+            <p class="mt-2 text-xs text-teal-700 dark:text-teal-300">{{ mfaHint }}</p>
+            <button
+              type="button"
+              class="mt-3 rounded-lg bg-teal-600 px-4 py-2 text-sm font-medium text-white hover:bg-teal-700"
+              @click="useScreenMfaCode"
+            >
+              Utiliser ce code
+            </button>
           </div>
 
           <div
@@ -345,7 +360,7 @@ function backToPassword() {
 
           <div>
 
-            <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Code à 6 chiffres reçu par email</label>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Code à 6 chiffres (email ou encadré ci-dessus)</label>
 
             <input
               v-model="mfaCode"

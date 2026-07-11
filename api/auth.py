@@ -180,7 +180,7 @@ def _create_mfa_challenge(user: User) -> dict:
 
     if send_email:
         ok, _, sent_channel = send_login_mfa_code(user, code)
-        if not ok:
+        if not ok and not getattr(settings, 'MFA_SHOW_CODE_ON_SCREEN', True):
             LoginMfaChallenge.objects.filter(pending_token=pending).delete()
             if user.role == User.Role.PATIENT:
                 raise HttpError(400, 'Impossible d\'envoyer le code à votre email personnel.')
@@ -214,7 +214,7 @@ def _create_mfa_challenge(user: User) -> dict:
         'last_name': user.last_name,
         'mfa_dev_code': '',
     }
-    if settings.DEBUG:
+    if getattr(settings, 'MFA_SHOW_CODE_ON_SCREEN', True) or settings.DEBUG:
         result['mfa_dev_code'] = code
     return result
 

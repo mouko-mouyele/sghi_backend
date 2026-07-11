@@ -41,7 +41,7 @@ class LoginResultOut(Schema):
     email: str = ''
     first_name: str = ''
     last_name: str = ''
-    mfa_dev_code: str = ''  # uniquement si DEBUG=True (aide aux tests)
+    mfa_dev_code: str = ''  # code affiché à l'écran si MFA_SHOW_CODE_ON_SCREEN=True
 
 
 class LoginMfaVerifyIn(Schema):

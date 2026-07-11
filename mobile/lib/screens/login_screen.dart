@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui' show FontFeature;
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import 'patient_home_screen.dart';
@@ -25,6 +26,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _mfaStep = false;
   String _pendingToken = '';
   String _mfaHint = '';
+  String _mfaScreenCode = '';
   String _pendingRole = '';
   int _mfaSecondsLeft = 0;
   bool _mfaExpired = false;
@@ -111,6 +113,7 @@ class _LoginScreenState extends State<LoginScreen> {
           _mfaStep = true;
           _pendingToken = result.pendingToken;
           _mfaHint = result.mfaHint;
+          _mfaScreenCode = result.mfaScreenCode;
           _pendingRole = result.role;
         });
         _startMfaTimer(result.mfaExpiresIn);
@@ -173,6 +176,7 @@ class _LoginScreenState extends State<LoginScreen> {
       _mfaExpired = false;
       _mfaSecondsLeft = 0;
       _pendingToken = '';
+      _mfaScreenCode = '';
       _mfaCode.clear();
       _error = null;
     });
@@ -267,6 +271,45 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ] else ...[
+                    if (_mfaScreenCode.isNotEmpty) ...[
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.teal.shade50,
+                          border: Border.all(color: Colors.teal.shade400, width: 2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Column(
+                          children: [
+                            Text(
+                              'Code de vérification — aussi envoyé par email',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontWeight: FontWeight.w600, color: Colors.teal.shade900),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              _mfaScreenCode,
+                              style: TextStyle(
+                                fontSize: 36,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 8,
+                                color: Colors.teal.shade800,
+                                fontFeatures: const [FontFeature.tabularFigures()],
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            FilledButton.tonal(
+                              onPressed: _mfaExpired
+                                  ? null
+                                  : () => setState(() => _mfaCode.text = _mfaScreenCode),
+                              child: const Text('Utiliser ce code'),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
