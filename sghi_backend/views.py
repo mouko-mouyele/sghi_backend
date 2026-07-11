@@ -1,32 +1,40 @@
-import os
-from django.shortcuts import render
-from django.views.generic import TemplateView
+import mimetypes
+from pathlib import Path
+
 from django.conf import settings
-from django.http import FileResponse
+from django.http import FileResponse, Http404
+from django.shortcuts import render
+
+FRONTEND_DIST = Path(settings.BASE_DIR) / 'frontend' / 'dist'
 
 
-def home(request):
-    """Serve the Vite frontend index.html"""
-    frontend_dist = os.path.join(settings.BASE_DIR, 'frontend', 'dist', 'index.html')
-    
-    if os.path.exists(frontend_dist):
-        with open(frontend_dist, 'r', encoding='utf-8') as f:
-            return FileResponse(f, content_type='text/html')
-    else:
-        # Fallback for development when frontend build doesn't exist
+def _safe_dist_path(relative: str) -> Path:
+    target = (FRONTEND_DIST / relative).resolve()
+    root = FRONTEND_DIST.resolve()
+    if not str(target).startswith(str(root)):
+        raise Http404('Invalid path')
+    return target
+
+
+def serve_frontend_index(request):
+    """Sert index.html du build Vite (SPA Vue)."""
+    index = FRONTEND_DIST / 'index.html'
+    if not index.is_file():
         return render(request, 'home.html')
+    return FileResponse(index.open('rb'), content_type='text/html; charset=utf-8')
 
 
-class FrontendFallbackView(TemplateView):
-    """
-    Fallback view for Vue Router - serves index.html for all non-API routes
-    This allows Vue Router to handle client-side routing
-    """
-    template_name = 'home.html'
-    
-    def get_template_names(self):
-        frontend_dist = os.path.join(settings.BASE_DIR, 'frontend', 'dist', 'index.html')
-        if os.path.exists(frontend_dist):
-            return ['frontend/dist/index.html']
-        return [self.template_name]
+def serve_frontend_asset(request, path: str):
+    """Sert JS/CSS/images du build Vite (/assets/...)."""
+    file_path = _safe_dist_path(path)
+    if not file_path.is_file():
+        raise Http404
+    content_type, _ = mimetypes.guess_type(str(file_path))
+    return FileResponse(
+        file_path.open('rb'),
+        content_type=content_type or 'application/octet-stream',
+    )
 
+
+def serve_favicon(request):
+    return serve_frontend_asset(request, 'favicon.svg')
