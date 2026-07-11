@@ -4,12 +4,14 @@ import { useRouter } from 'vue-router'
 import { auth, setSession } from '../api/client'
 import { patientApi } from '../api/patient.js'
 import { HOSPITAL_EMERGENCY_PHONE } from '../utils/hospital.js'
+import PasswordField from '../components/PasswordField.vue'
 import ThemeToggle from '../components/ThemeToggle.vue'
+import { parseApiError } from '../utils/errors.js'
 
 const router = useRouter()
 const etab = ref(null)
 const form = ref({
-  username: '', password: '', email: '', nom: '', prenom: '',
+  username: '', password: '', passwordConfirm: '', email: '', nom: '', prenom: '',
   date_naissance: '', sexe: 'M', telephone: '', adresse: '',
   consentement_traitement: true,
 })
@@ -28,17 +30,26 @@ async function handleRegister() {
     error.value = 'Le numéro de téléphone est obligatoire'
     return
   }
+  if (form.value.password.length < 10) {
+    error.value = 'Le mot de passe doit contenir au moins 10 caractères'
+    return
+  }
+  if (form.value.password !== form.value.passwordConfirm) {
+    error.value = 'Les mots de passe ne correspondent pas'
+    return
+  }
   loading.value = true
   error.value = ''
   try {
+    const { passwordConfirm, ...payload } = form.value
     const { data } = await auth.registerPatient({
-      ...form.value,
+      ...payload,
       telephone: form.value.telephone.trim(),
     })
     setSession(data)
     router.push('/patient')
   } catch (e) {
-    error.value = e.response?.data?.detail || 'Erreur lors de l\'inscription'
+    error.value = parseApiError(e, 'Erreur lors de l\'inscription')
   } finally {
     loading.value = false
   }
@@ -94,6 +105,29 @@ async function handleRegister() {
           <label class="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">Email</label>
           <input v-model="form.email" type="email" class="input-field" required />
         </div>
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label class="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">Mot de passe</label>
+            <PasswordField
+              v-model="form.password"
+              placeholder="Min. 10 caractères"
+              :minlength="10"
+              autocomplete="new-password"
+              required
+            />
+            <p class="mt-1 text-xs text-slate-400">Majuscule, minuscule et chiffre</p>
+          </div>
+          <div>
+            <label class="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">Confirmer le mot de passe</label>
+            <PasswordField
+              v-model="form.passwordConfirm"
+              placeholder="Retapez le mot de passe"
+              :minlength="10"
+              autocomplete="new-password"
+              required
+            />
+          </div>
+        </div>
         <div>
           <label class="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">Téléphone mobile</label>
           <input
@@ -111,10 +145,6 @@ async function handleRegister() {
         <div>
           <label class="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">Adresse (optionnel)</label>
           <input v-model="form.adresse" v-input-filter="'text'" type="text" class="input-field" placeholder="Quartier, ville…" />
-        </div>
-        <div>
-          <label class="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">Mot de passe (10+ car., maj, min, chiffre)</label>
-          <PasswordField v-model="form.password" placeholder="Mot de passe" :minlength="10" autocomplete="new-password" required />
         </div>
         <div class="grid gap-4 sm:grid-cols-2">
           <div>
