@@ -5,6 +5,7 @@ from datetime import timedelta
 from pathlib import Path
 
 from decouple import config, Csv
+import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -66,26 +67,32 @@ WSGI_APPLICATION = 'sghi_backend.wsgi.application'
 
 AUTH_USER_MODEL = 'accounts.User'
 
-# Base de données — PostgreSQL en production, SQLite en dev
-_db_engine = config('DB_ENGINE', default='django.db.backends.sqlite3')
-if _db_engine == 'django.db.backends.sqlite3':
+# Base de données — PostgreSQL en production (Render), SQLite en dev
+_database_url = config('DATABASE_URL', default='')
+if _database_url:
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / config('DB_NAME', default='db.sqlite3'),
-        }
+        'default': dj_database_url.parse(_database_url, conn_max_age=600, ssl_require=False),
     }
 else:
-    DATABASES = {
-        'default': {
-            'ENGINE': _db_engine,
-            'NAME': config('DB_NAME'),
-            'USER': config('DB_USER', default=''),
-            'PASSWORD': config('DB_PASSWORD', default=''),
-            'HOST': config('DB_HOST', default='localhost'),
-            'PORT': config('DB_PORT', default='5432'),
+    _db_engine = config('DB_ENGINE', default='django.db.backends.sqlite3')
+    if _db_engine == 'django.db.backends.sqlite3':
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': BASE_DIR / config('DB_NAME', default='db.sqlite3'),
+            }
         }
-    }
+    else:
+        DATABASES = {
+            'default': {
+                'ENGINE': _db_engine,
+                'NAME': config('DB_NAME'),
+                'USER': config('DB_USER', default=''),
+                'PASSWORD': config('DB_PASSWORD', default=''),
+                'HOST': config('DB_HOST', default='localhost'),
+                'PORT': config('DB_PORT', default='5432'),
+            }
+        }
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},

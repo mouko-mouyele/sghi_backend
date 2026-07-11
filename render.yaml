@@ -3,40 +3,23 @@ services:
     name: sghi-backend
     runtime: python
     plan: free
-    pythonVersion: 3.12
     buildCommand: bash build.sh
     startCommand: gunicorn sghi_backend.wsgi:application --bind 0.0.0.0:$PORT
-    healthCheckPath: /
+    healthCheckPath: /api/v1/sante
 
     envVars:
       - key: DEBUG
-        value: false
+        value: "false"
       - key: PYTHON_VERSION
-        value: 3.12
+        value: "3.12.8"
       - key: SECRET_KEY
         generateValue: true
       - key: ALLOWED_HOSTS
         value: sghi-backend.onrender.com
-      - key: DB_ENGINE
-        value: django.db.backends.postgresql
-      - key: DB_NAME
+      - key: DATABASE_URL
         fromDatabase:
           name: sghi-db
-          property: database
-      - key: DB_USER
-        fromDatabase:
-          name: sghi-db
-          property: user
-      - key: DB_PASSWORD
-        fromDatabase:
-          name: sghi-db
-          property: password
-      - key: DB_HOST
-        fromDatabase:
-          name: sghi-db
-          property: host
-      - key: DB_PORT
-        value: "5432"
+          property: connectionString
       - key: FRONTEND_BASE_URL
         value: https://sghi-backend.onrender.com
       - key: SITE_URL
