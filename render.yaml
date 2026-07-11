@@ -22,7 +22,7 @@ services:
       - key: DB_NAME
         fromDatabase:
           name: sghi-db
-          property: dbName
+          property: database
       - key: DB_USER
         fromDatabase:
           name: sghi-db
