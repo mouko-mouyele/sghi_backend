@@ -14,22 +14,27 @@ function processQueue(err, token = null) {
   pending = []
 }
 
-const PUBLIC_AUTH_PATHS = [
+const PUBLIC_AUTH_PATHS = new Set([
   '/auth/login',
   '/auth/login/mfa',
   '/auth/register/patient',
   '/auth/refresh',
-]
+])
+
+/** Chemin API sans query — évite les faux positifs (.includes sur /auth/register). */
+function normalizeApiPath(url = '') {
+  const path = (String(url).split('?')[0] || '').replace(/\/+$/, '') || '/'
+  return path.startsWith('/') ? path : `/${path}`
+}
 
 function isPublicAuthRoute(url = '') {
-  return PUBLIC_AUTH_PATHS.some((path) => url.includes(path))
+  return PUBLIC_AUTH_PATHS.has(normalizeApiPath(url))
 }
 
 api.interceptors.request.use((config) => {
-  const url = config.url || ''
-  if (!isPublicAuthRoute(url)) {
-    const token = localStorage.getItem('access_token')
-    if (isValidToken(token)) config.headers.Authorization = `Bearer ${token}`
+  const token = localStorage.getItem('access_token')
+  if (isValidToken(token)) {
+    config.headers.Authorization = `Bearer ${token}`
   }
   return config
 })

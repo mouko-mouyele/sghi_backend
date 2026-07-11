@@ -146,10 +146,15 @@ async function deleteRdv(id, patientNom) {
 
 async function changeStatut(id, statut) {
   if (!statut) return
-  await adminApi.updateAppointment(id, { statut })
-  const labels = { CONFIRME: 'confirmé', ANNULE: 'annulé' }
-  message.value = `RDV ${labels[statut] || 'mis à jour'} — emails envoyés au patient et au médecin`
-  load()
+  errorMsg.value = ''
+  try {
+    await adminApi.updateAppointment(id, { statut })
+    const labels = { CONFIRME: 'confirmé', ANNULE: 'annulé' }
+    message.value = `RDV ${labels[statut] || 'mis à jour'} — emails envoyés au patient et au médecin`
+    load()
+  } catch (e) {
+    errorMsg.value = parseApiError(e, 'Impossible de mettre à jour le rendez-vous')
+  }
 }
 
 async function confirmRdv(id) {

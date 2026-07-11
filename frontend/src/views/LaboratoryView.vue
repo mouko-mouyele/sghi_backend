@@ -8,6 +8,7 @@ import { parseApiError } from '../utils/errors.js'
 
 const role = computed(() => getRole())
 const isBiologist = computed(() => ['BIOLOGISTE', 'ADMIN'].includes(role.value))
+const canExportCsv = computed(() => ['BIOLOGISTE', 'ADMIN', 'RECEPTIONNISTE'].includes(role.value))
 const canPrescribe = computed(() => ['MEDECIN', 'ADMIN'].includes(role.value))
 
 const user = ref(null)
@@ -264,7 +265,7 @@ onUnmounted(() => {
           <p class="text-sm capitalize text-violet-300">{{ clockLabel }}</p>
           <div class="mt-4 flex flex-wrap justify-end gap-2">
             <button
-              v-if="isBiologist"
+              v-if="canExportCsv"
               class="inline-flex items-center gap-2 rounded-xl bg-white/10 px-4 py-2.5 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/20 disabled:opacity-50"
               :disabled="exporting"
               @click="exportCsv"

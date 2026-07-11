@@ -88,7 +88,13 @@ def list_lab_tests(request):
 
 @router.get('/tableau-de-bord', response=LabDashboardOut, auth=jwt_auth)
 def lab_dashboard(request):
-    require_role(request.auth, User.Role.MEDECIN, User.Role.BIOLOGISTE, User.Role.ADMIN)
+    require_role(
+        request.auth,
+        User.Role.MEDECIN,
+        User.Role.BIOLOGISTE,
+        User.Role.ADMIN,
+        User.Role.RECEPTIONNISTE,
+    )
     today = dj_tz.localdate()
     qs = LabOrder.objects.all()
     en_analyse = qs.filter(
@@ -115,7 +121,13 @@ def lab_dashboard(request):
 
 @router.get('/commandes', response=list[LabOrderDetailOut], auth=jwt_auth)
 def list_lab_orders(request, statut: str = ''):
-    require_role(request.auth, User.Role.MEDECIN, User.Role.BIOLOGISTE, User.Role.ADMIN)
+    require_role(
+        request.auth,
+        User.Role.MEDECIN,
+        User.Role.BIOLOGISTE,
+        User.Role.ADMIN,
+        User.Role.RECEPTIONNISTE,
+    )
     qs = LabOrder.objects.select_related('patient', 'examen', 'resultat', 'resultat__valide_par')
     if statut:
         qs = qs.filter(statut=statut)
@@ -125,7 +137,12 @@ def list_lab_orders(request, statut: str = ''):
 @router.get('/commandes/export/csv', auth=jwt_auth)
 def export_lab_orders_csv(request, statut: str = ''):
     """Export CSV (séparateur ; + BOM UTF-8) compatible Excel."""
-    require_role(request.auth, User.Role.BIOLOGISTE, User.Role.ADMIN)
+    require_role(
+        request.auth,
+        User.Role.BIOLOGISTE,
+        User.Role.ADMIN,
+        User.Role.RECEPTIONNISTE,
+    )
     qs = LabOrder.objects.select_related(
         'patient', 'examen', 'resultat', 'resultat__valide_par',
     ).order_by('-date_commande')

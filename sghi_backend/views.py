@@ -21,7 +21,11 @@ def serve_frontend_index(request):
     index = FRONTEND_DIST / 'index.html'
     if not index.is_file():
         return render(request, 'home.html')
-    return FileResponse(index.open('rb'), content_type='text/html; charset=utf-8')
+    response = FileResponse(index.open('rb'), content_type='text/html; charset=utf-8')
+    response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response['Pragma'] = 'no-cache'
+    response['Expires'] = '0'
+    return response
 
 
 def serve_frontend_asset(request, path: str):
