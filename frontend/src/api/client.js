@@ -17,7 +17,7 @@ function processQueue(err, token = null) {
 const PUBLIC_AUTH_PATHS = [
   '/auth/login',
   '/auth/login/mfa',
-  '/auth/register',
+  '/auth/register/patient',
   '/auth/refresh',
 ]
 
