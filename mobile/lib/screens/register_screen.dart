@@ -13,6 +13,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _form = {
     'username': TextEditingController(),
     'password': TextEditingController(),
+    'passwordConfirm': TextEditingController(),
     'email': TextEditingController(),
     'nom': TextEditingController(),
     'prenom': TextEditingController(),
@@ -25,14 +26,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Future<void> _register() async {
     final phone = (_form['telephone'] as TextEditingController).text.trim();
+    final password = (_form['password'] as TextEditingController).text;
+    final passwordConfirm = (_form['passwordConfirm'] as TextEditingController).text;
     if (phone.isEmpty) {
       setState(() => _error = 'Le numéro de téléphone est obligatoire');
+      return;
+    }
+    if (password.length < 10) {
+      setState(() => _error = 'Le mot de passe doit contenir au moins 10 caractères');
+      return;
+    }
+    if (password != passwordConfirm) {
+      setState(() => _error = 'Les mots de passe ne correspondent pas');
       return;
     }
     setState(() { _loading = true; _error = null; });
     final payload = {
       'username': (_form['username'] as TextEditingController).text.trim(),
-      'password': (_form['password'] as TextEditingController).text,
+      'password': password,
       'email': (_form['email'] as TextEditingController).text.trim(),
       'nom': (_form['nom'] as TextEditingController).text.trim(),
       'prenom': (_form['prenom'] as TextEditingController).text.trim(),
