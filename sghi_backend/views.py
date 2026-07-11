@@ -26,7 +26,7 @@ def serve_frontend_index(request):
 
 def serve_frontend_asset(request, path: str):
     """Sert JS/CSS/images du build Vite (/assets/...)."""
-    file_path = _safe_dist_path(path)
+    file_path = _safe_dist_path(f'assets/{path}')
     if not file_path.is_file():
         raise Http404
     content_type, _ = mimetypes.guess_type(str(file_path))
