@@ -173,6 +173,7 @@ EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='').strip()
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='').replace(' ', '')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='SGHL <noreply@sghl.local>')
 MFA_HOSPITAL_EMAIL = config('MFA_HOSPITAL_EMAIL', default='').strip()
+EMAIL_TIMEOUT = config('EMAIL_TIMEOUT', default=15, cast=int)
 # Afficher le code MFA à l'écran (en plus de l'email) pour saisie rapide
 MFA_SHOW_CODE_ON_SCREEN = config('MFA_SHOW_CODE_ON_SCREEN', default=True, cast=bool)
 

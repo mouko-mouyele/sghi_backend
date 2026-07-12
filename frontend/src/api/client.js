@@ -4,6 +4,7 @@ import { clearSession, isJustLoggedIn, isValidToken } from '../utils/auth.js'
 const api = axios.create({
   baseURL: '/api/v1',
   headers: { 'Content-Type': 'application/json' },
+  timeout: 90000,
 })
 
 let isRefreshing = false

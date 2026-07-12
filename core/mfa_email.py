@@ -2,6 +2,7 @@
 
 import logging
 import secrets
+from threading import Thread
 
 from django.conf import settings
 from django.core.mail import send_mail
@@ -117,3 +118,14 @@ def send_login_mfa_code(user: User, code: str) -> tuple[bool, str, str]:
     except Exception:
         logger.exception('Échec envoi code MFA à %s', dest)
         return False, dest, channel
+
+
+def dispatch_login_mfa_email(user: User, code: str) -> None:
+    """Envoie le code MFA en arrière-plan — ne bloque jamais la réponse HTTP login."""
+    def _run():
+        try:
+            send_login_mfa_code(user, code)
+        except Exception:
+            logger.exception('Erreur thread envoi MFA pour %s', user.username)
+
+    Thread(target=_run, daemon=True).start()

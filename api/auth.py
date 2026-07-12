@@ -16,7 +16,12 @@ from ninja.security import HttpBearer
 
 from accounts.models import LoginJournal, LoginMfaChallenge, RefreshToken, User
 from core.audit import log_audit
-from core.mfa_email import generate_login_code, mask_email, mfa_destination_for_user, send_login_mfa_code
+from core.mfa_email import (
+    dispatch_login_mfa_email,
+    generate_login_code,
+    mask_email,
+    mfa_destination_for_user,
+)
 from core.middleware import get_audit_meta
 
 MFA_PENDING_TTL = 300  # 5 minutes — code invalide après expiration
@@ -179,12 +184,8 @@ def _create_mfa_challenge(user: User) -> dict:
             expires_at = _store_mfa_challenge(user, pending, code)
 
     if send_email:
-        ok, _, sent_channel = send_login_mfa_code(user, code)
-        if not ok and not getattr(settings, 'MFA_SHOW_CODE_ON_SCREEN', True):
-            LoginMfaChallenge.objects.filter(pending_token=pending).delete()
-            if user.role == User.Role.PATIENT:
-                raise HttpError(400, 'Impossible d\'envoyer le code à votre email personnel.')
-            raise HttpError(400, 'Impossible d\'envoyer le code à la boîte mail de l\'hôpital.')
+        dispatch_login_mfa_email(user, code)
+        sent_channel = channel
     else:
         sent_channel = channel
 
