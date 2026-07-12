@@ -86,13 +86,13 @@ curl https://sghi-backend.onrender.com/api/v1/...
 https://sghi-backend.onrender.com
 ```
 
-### Application mobile Flutter (Web)
+### Application mobile Flutter (Web) — GitHub Pages
 
-- **URL** : `https://sghi-mobile.onrender.com`
-- Site statique (pas de veille comme l'API)
-- Build via `mobile/build_web.sh` (Flutter Web)
+Render ne peut pas compiler Flutter (manque de RAM). Le mobile est hébergé sur **GitHub Pages** :
 
-Après sync du Blueprint, Render crée automatiquement le service **sghi-mobile**.
+- **URL** : `https://mouko-mouyele.github.io/sghi_backend/`
+- Déploiement auto via `.github/workflows/mobile-web.yml` à chaque push sur `main`
+- **Pages** : Settings → Pages → branche `gh-pages`
 
 ## 📝 Monitoring
 
