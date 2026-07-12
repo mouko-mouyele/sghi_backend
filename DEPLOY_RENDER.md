@@ -45,6 +45,9 @@ Render détectera automatiquement `render.yaml` :
 - ✅ Base de données PostgreSQL
 - ✅ Variables d'environnement
 
+> **Important :** si une erreur mentionne `pythonVersion` ou `DB_HOST`, Render utilise un ancien commit.
+> Allez dans le Blueprint → **Manual sync** pour récupérer le dernier commit `main` sur GitHub.
+
 ### 5️⃣ Définir les Variables d'Environnement
 
 Render va te demander d'ajouter les variables manquantes :
@@ -82,6 +85,14 @@ curl https://sghi-backend.onrender.com/api/v1/...
 # Frontend
 https://sghi-backend.onrender.com
 ```
+
+### Application mobile Flutter (Web)
+
+- **URL** : `https://sghi-mobile.onrender.com`
+- Site statique (pas de veille comme l'API)
+- Build via `mobile/build_web.sh` (Flutter Web)
+
+Après sync du Blueprint, Render crée automatiquement le service **sghi-mobile**.
 
 ## 📝 Monitoring
 

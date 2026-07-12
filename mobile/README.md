@@ -16,7 +16,25 @@ Les autres rôles (admin, infirmier, etc.) utilisent le **portail web** Vue.js.
 1. Backend Django lancé : `python manage.py runserver` (port **8000**)
 2. Flutter SDK 3.2+
 
-## Lancer dans Chrome (test rapide)
+## Hébergement gratuit (Render Web)
+
+L'app Flutter **Web** est déployée sur Render en site statique :
+
+- **URL** : [https://sghi-mobile.onrender.com](https://sghi-mobile.onrender.com)
+- **Backend API** : [https://sghi-backend.onrender.com/api/v1](https://sghi-backend.onrender.com/api/v1)
+
+Build local (identique à Render) :
+
+```bash
+cd mobile
+flutter pub get
+flutter build web --release --dart-define=SGHL_API_URL=https://sghi-backend.onrender.com/api/v1
+# Fichiers dans build/web/
+```
+
+Sur téléphone : ouvrez l'URL dans Chrome/Safari → **Ajouter à l'écran d'accueil** (PWA).
+
+## Lancer dans Chrome (développement local)
 
 ```bash
 cd mobile
