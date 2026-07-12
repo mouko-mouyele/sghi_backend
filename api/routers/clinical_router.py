@@ -108,8 +108,15 @@ def _hosp_detail(h: Hospitalization) -> HospitalizationDetailOut:
 
 @router.get('/patients', response=PaginatedPatientsOut, auth=jwt_auth)
 def list_patients(request, page: int = 1, page_size: int = 20, search: str = ''):
-    require_role(request.auth, User.Role.ADMIN, User.Role.MEDECIN, User.Role.INFIRMIER,
-                 User.Role.RECEPTIONNISTE, User.Role.BIOLOGISTE)
+    require_role(
+        request.auth,
+        User.Role.ADMIN,
+        User.Role.MEDECIN,
+        User.Role.INFIRMIER,
+        User.Role.RECEPTIONNISTE,
+        User.Role.BIOLOGISTE,
+        User.Role.COMPTABLE,
+    )
     qs = Patient.objects.filter(archived=False).order_by('nom', 'prenom')
     if search:
         qs = qs.filter(Q(nom__icontains=search) | Q(prenom__icontains=search) | Q(numero_dossier__icontains=search))

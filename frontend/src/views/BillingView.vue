@@ -10,6 +10,8 @@ import { usePagination } from '../composables/usePagination.js'
 const invoices = ref([])
 const journal = ref([])
 const patientList = ref([])
+const patientsLoading = ref(false)
+const patientSearch = ref('')
 const loading = ref(true)
 const tab = ref('factures')
 const filterStatut = ref('')
@@ -94,9 +96,30 @@ async function loadJournal() {
   journalPagination.applyMeta(data)
 }
 
-async function loadPatients() {
-  const { data } = await patients.list({ page: 1, page_size: 100 })
-  patientList.value = data.items
+async function loadPatients(search = patientSearch.value) {
+  patientsLoading.value = true
+  try {
+    const { data } = await patients.list({
+      page: 1,
+      page_size: 100,
+      search: search?.trim() || undefined,
+    })
+    patientList.value = data.items
+  } catch (e) {
+    patientList.value = []
+    errorMsg.value = parseApiError(e, 'Impossible de charger la liste des patients')
+  } finally {
+    patientsLoading.value = false
+  }
+}
+
+function toggleCreateForm() {
+  showCreate.value = !showCreate.value
+  if (showCreate.value) {
+    createForm.value = { patient_id: '', hospitalisation_id: '' }
+    patientSearch.value = ''
+    loadPatients()
+  }
 }
 
 async function openDetail(id) {
@@ -208,6 +231,11 @@ async function addLine() {
 }
 
 async function createInvoice() {
+  errorMsg.value = ''
+  if (!createForm.value.patient_id) {
+    errorMsg.value = 'Veuillez sélectionner un patient à facturer'
+    return
+  }
   try {
     await billing.createInvoice({
       patient_id: Number(createForm.value.patient_id),
@@ -307,7 +335,7 @@ onMounted(async () => {
           <h1 class="font-display text-3xl font-bold">Facturation</h1>
           <p class="mt-2 text-violet-100">Tiers-payant · Mobile Money · Statuts payé / impayé</p>
         </div>
-        <button class="rounded-xl bg-white/15 px-4 py-2 text-sm font-semibold backdrop-blur hover:bg-white/25" @click="showCreate = !showCreate">
+        <button class="rounded-xl bg-white/15 px-4 py-2 text-sm font-semibold backdrop-blur hover:bg-white/25" @click="toggleCreateForm">
           + Nouvelle facture
         </button>
       </div>
@@ -337,11 +365,37 @@ onMounted(async () => {
     <div v-if="showCreate" class="card mb-6">
       <h2 class="mb-4 font-semibold">Nouvelle facture</h2>
       <div class="grid gap-4 sm:grid-cols-2">
-        <select v-model="createForm.patient_id" class="input-field">
-          <option value="">Patient…</option>
-          <option v-for="p in patientList" :key="p.id" :value="p.id">{{ p.prenom }} {{ p.nom }} ({{ p.numero_dossier }})</option>
-        </select>
-        <input v-model="createForm.hospitalisation_id" class="input-field" placeholder="ID hospitalisation (optionnel)" />
+        <div class="sm:col-span-2">
+          <label class="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">Rechercher un patient</label>
+          <div class="flex gap-2">
+            <input
+              v-model="patientSearch"
+              type="search"
+              class="input-field flex-1"
+              placeholder="Nom, prénom ou n° dossier…"
+              @keyup.enter="loadPatients()"
+            />
+            <button type="button" class="rounded-xl border px-4 py-2 text-sm dark:border-slate-600" @click="loadPatients()">
+              Rechercher
+            </button>
+          </div>
+        </div>
+        <div>
+          <label class="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">Patient à facturer *</label>
+          <select v-model="createForm.patient_id" class="input-field" :disabled="patientsLoading">
+            <option value="">{{ patientsLoading ? 'Chargement…' : 'Choisir un patient…' }}</option>
+            <option v-for="p in patientList" :key="p.id" :value="p.id">
+              {{ p.prenom }} {{ p.nom }} — {{ p.numero_dossier }}
+            </option>
+          </select>
+          <p v-if="!patientsLoading && !patientList.length" class="mt-2 text-xs text-amber-700 dark:text-amber-300">
+            Aucun patient trouvé. Lancez une recherche ou contactez l'administrateur.
+          </p>
+        </div>
+        <div>
+          <label class="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">Hospitalisation (optionnel)</label>
+          <input v-model="createForm.hospitalisation_id" class="input-field" placeholder="ID hospitalisation" />
+        </div>
       </div>
       <button class="btn-primary mt-4" @click="createInvoice">Créer le brouillon</button>
     </div>

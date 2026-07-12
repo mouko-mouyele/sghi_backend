@@ -16,7 +16,7 @@ ROLE_PERMISSIONS = {
     },
     'BIOLOGISTE': {'lab', 'dashboard'},
     'PHARMACIEN': {'pharmacie', 'prescriptions_read', 'dashboard'},
-    'COMPTABLE': {'billing', 'dashboard'},
+    'COMPTABLE': {'billing', 'patients_read', 'dashboard'},
     'RECEPTIONNISTE': {
         'patients', 'admissions', 'rdv', 'documents', 'billing_read', 'dashboard',
         'medecins', 'hospitalisations',
