@@ -17,6 +17,33 @@ const journal = ref([])
 const pagination = usePagination(15)
 
 const mfa = ref({ mfa_enabled: true, hospital_email: '', hospital_email_masked: '', message: '' })
+const emailDiag = ref(null)
+const emailTestMsg = ref('')
+const emailTestError = ref('')
+const emailTesting = ref(false)
+
+async function loadEmailDiag() {
+  try {
+    const { data } = await adminApi.emailDiagnostic()
+    emailDiag.value = data
+  } catch {
+    emailDiag.value = null
+  }
+}
+
+async function testEmail() {
+  emailTesting.value = true
+  emailTestMsg.value = ''
+  emailTestError.value = ''
+  try {
+    const { data } = await adminApi.testEmail()
+    emailTestMsg.value = data.detail
+  } catch (e) {
+    emailTestError.value = e.response?.data?.detail || 'Échec du test email'
+  } finally {
+    emailTesting.value = false
+  }
+}
 
 
 
@@ -70,6 +97,8 @@ onMounted(() => {
   load()
 
   loadMfa()
+
+  loadEmailDiag()
 
 })
 
@@ -143,6 +172,28 @@ onMounted(() => {
 
         <p class="mt-3 text-xs text-slate-500">Patients : code envoyé sur leur email personnel enregistré.</p>
 
+      </div>
+
+      <div v-if="emailDiag" class="mt-4 rounded-xl border border-slate-200 p-4 dark:border-slate-600">
+        <p class="text-sm font-medium text-slate-800 dark:text-slate-100">Configuration SMTP (Gmail)</p>
+        <p class="mt-1 text-xs" :class="emailDiag.configured ? 'text-emerald-600' : 'text-amber-700 dark:text-amber-300'">
+          {{ emailDiag.message }}
+        </p>
+        <ul class="mt-2 space-y-1 text-xs text-slate-500 dark:text-slate-400">
+          <li>Serveur : {{ emailDiag.smtp_host }}:{{ emailDiag.smtp_port }}</li>
+          <li>Compte : {{ emailDiag.smtp_user || '—' }}</li>
+          <li>Mot de passe app : {{ emailDiag.password_set ? '✓ configuré' : '✗ manquant dans Render' }}</li>
+        </ul>
+        <button
+          type="button"
+          class="btn-primary mt-4"
+          :disabled="emailTesting"
+          @click="testEmail"
+        >
+          {{ emailTesting ? 'Envoi…' : '📧 Tester l\'envoi email' }}
+        </button>
+        <p v-if="emailTestMsg" class="mt-3 text-sm text-emerald-700 dark:text-emerald-300">{{ emailTestMsg }}</p>
+        <p v-if="emailTestError" class="mt-3 text-sm text-red-600 dark:text-red-400">{{ emailTestError }}</p>
       </div>
 
     </div>

@@ -73,6 +73,23 @@ class MfaSetupOut(Schema):
     message: str = ''
 
 
+class EmailDiagnosticOut(Schema):
+    configured: bool
+    smtp_host: str
+    smtp_port: int
+    smtp_user: str
+    from_email: str
+    hospital_email: str
+    password_set: bool
+    message: str
+
+
+class EmailTestOut(Schema):
+    success: bool
+    detail: str
+    sent_to: str = ''
+
+
 class TokenOut(Schema):
     access_token: str
     refresh_token: str

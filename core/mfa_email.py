@@ -5,10 +5,10 @@ import secrets
 from threading import Thread
 
 from django.conf import settings
-from django.core.mail import send_mail
 
 from accounts.models import User
 from core.models import HospitalInfo
+from core.sghi_mail import send_sghi_email
 
 logger = logging.getLogger(__name__)
 
@@ -91,7 +91,7 @@ def send_login_mfa_code(user: User, code: str) -> tuple[bool, str, str]:
             f'Ne partagez ce code avec personne.'
         )
 
-    body = intro + '\n\n— SGHL / CHU Brazzaville'
+    body = intro
 
     if not settings.EMAIL_HOST_USER:
         preview = (
@@ -106,26 +106,26 @@ def send_login_mfa_code(user: User, code: str) -> tuple[bool, str, str]:
         logger.info(preview)
         return True, dest, channel
 
-    try:
-        send_mail(
-            subject=subject,
-            message=body,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[dest],
-            fail_silently=False,
-        )
-        return True, dest, channel
-    except Exception:
-        logger.exception('Échec envoi code MFA à %s', dest)
+    ok, err = send_sghi_email(subject, body, [dest])
+    if not ok:
+        logger.error('MFA email non livré à %s : %s', dest, err)
         return False, dest, channel
+    return True, dest, channel
 
 
 def dispatch_login_mfa_email(user: User, code: str) -> None:
-    """Envoie le code MFA en arrière-plan — ne bloque jamais la réponse HTTP login."""
+    """Envoie le code MFA en arrière-plan — thread non-daemon pour Render/Gunicorn."""
     def _run():
+        from django.db import close_old_connections
+
+        close_old_connections()
         try:
-            send_login_mfa_code(user, code)
+            ok, _, _ = send_login_mfa_code(user, code)
+            if not ok:
+                logger.error('MFA email non envoyé pour le compte %s', user.username)
         except Exception:
             logger.exception('Erreur thread envoi MFA pour %s', user.username)
+        finally:
+            close_old_connections()
 
-    Thread(target=_run, daemon=True).start()
+    Thread(target=_run, daemon=False, name=f'sghl-mfa-{user.pk}').start()

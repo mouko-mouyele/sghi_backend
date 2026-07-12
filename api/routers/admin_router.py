@@ -1,6 +1,7 @@
 from datetime import date, datetime, time, timedelta
 from decimal import Decimal
 
+from django.conf import settings
 from django.db.models import Count, Q, Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -34,7 +35,7 @@ from api.schemas_admin import (
     PaginatedLoginJournalOut,
 )
 from api.pagination import paginate_queryset, paginated
-from api.schemas import MfaSetupOut, PatientOut
+from api.schemas import MfaSetupOut, MessageOut, PatientOut, EmailDiagnosticOut, EmailTestOut
 from billing.models import Payment
 from clinical.appointment_utils import find_appointment_conflict, normalize_appointment_datetime
 from clinical.models import Appointment, Bed, Building, Hospitalization, HospitalService, Patient, Room
@@ -45,6 +46,7 @@ from core.appointment_mail import (
 )
 from core.audit import log_audit, snapshot
 from core.mfa_email import get_hospital_email, mask_email
+from core.sghi_mail import email_is_configured, send_sghi_email, sghi_from_email
 from core.middleware import get_audit_meta
 from core.models import HospitalInfo
 from core.pdf import generate_admin_stats_pdf
@@ -583,6 +585,56 @@ def admin_login_journal(request, page: int = 1, page_size: int = 15):
             user_agent=entry.user_agent,
         ) for entry in items
     ], meta)
+
+
+@router.get('/admin/email/diagnostic', response=EmailDiagnosticOut, auth=jwt_auth)
+def admin_email_diagnostic(request):
+    _require_admin(request)
+    hospital = get_hospital_email()
+    pwd_set = bool((getattr(settings, 'EMAIL_HOST_PASSWORD', '') or '').strip())
+    configured = email_is_configured()
+    if configured:
+        msg = 'SMTP Gmail configuré — utilisez « Tester l\'envoi » pour valider la réception.'
+    elif not (settings.EMAIL_HOST_USER or '').strip():
+        msg = 'EMAIL_HOST_USER manquant dans Render → Environment.'
+    elif not pwd_set:
+        msg = 'EMAIL_HOST_PASSWORD manquant — ajoutez le mot de passe d\'application Gmail dans Render.'
+    else:
+        msg = 'Configuration email incomplète.'
+    return EmailDiagnosticOut(
+        configured=configured,
+        smtp_host=settings.EMAIL_HOST,
+        smtp_port=settings.EMAIL_PORT,
+        smtp_user=(settings.EMAIL_HOST_USER or '').strip(),
+        from_email=sghi_from_email(),
+        hospital_email=hospital or '',
+        password_set=pwd_set,
+        message=msg,
+    )
+
+
+@router.post('/admin/email/test', response=EmailTestOut, auth=jwt_auth)
+def admin_email_test(request):
+    _require_admin(request)
+    dest = get_hospital_email() or (settings.EMAIL_HOST_USER or '').strip()
+    if not dest:
+        raise HttpError(400, 'Aucune adresse destinataire — configurez MFA_HOSPITAL_EMAIL dans Render.')
+    ok, err = send_sghi_email(
+        subject='[SGHL] Test email — configuration Gmail',
+        body=(
+            'Ceci est un email de test depuis SGHL (Render).\n\n'
+            'Si vous recevez ce message, les codes MFA et notifications '
+            'seront bien délivrés dans cette boîte mail.'
+        ),
+        to=[dest],
+    )
+    if ok:
+        return EmailTestOut(
+            success=True,
+            detail=f'Email de test envoyé à {mask_email(dest)} — vérifiez la boîte de réception et les spams.',
+            sent_to=dest,
+        )
+    raise HttpError(400, err or 'Échec envoi email')
 
 
 @router.get('/admin/mfa', response=MfaSetupOut, auth=jwt_auth)

@@ -41,7 +41,7 @@ services:
       - key: EMAIL_HOST_PASSWORD
         sync: false
       - key: DEFAULT_FROM_EMAIL
-        value: "SGHL CHU Brazzaville <moukomoise745@gmail.com>"
+        value: moukomoise745@gmail.com
       - key: WEB_CONCURRENCY
         value: "2"
 
