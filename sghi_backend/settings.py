@@ -168,10 +168,11 @@ else:
 EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
 EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
 EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
-EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
+EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='').strip()
+# Gmail : mot de passe d'application — espaces ignorés (ex. "abcd efgh …")
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='').replace(' ', '')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='SGHL <noreply@sghl.local>')
-MFA_HOSPITAL_EMAIL = config('MFA_HOSPITAL_EMAIL', default='')
+MFA_HOSPITAL_EMAIL = config('MFA_HOSPITAL_EMAIL', default='').strip()
 # Afficher le code MFA à l'écran (en plus de l'email) pour saisie rapide
 MFA_SHOW_CODE_ON_SCREEN = config('MFA_SHOW_CODE_ON_SCREEN', default=True, cast=bool)
 

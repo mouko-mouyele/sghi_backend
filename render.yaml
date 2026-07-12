@@ -29,7 +29,7 @@ services:
       - key: MFA_SHOW_CODE_ON_SCREEN
         value: "true"
       - key: MFA_HOSPITAL_EMAIL
-        sync: false
+        value: moukomoise745@gmail.com
       - key: EMAIL_HOST
         value: smtp.gmail.com
       - key: EMAIL_PORT
@@ -37,11 +37,11 @@ services:
       - key: EMAIL_USE_TLS
         value: "true"
       - key: EMAIL_HOST_USER
-        sync: false
+        value: moukomoise745@gmail.com
       - key: EMAIL_HOST_PASSWORD
         sync: false
       - key: DEFAULT_FROM_EMAIL
-        sync: false
+        value: "SGHL CHU Brazzaville <moukomoise745@gmail.com>"
       - key: WEB_CONCURRENCY
         value: "2"
 
