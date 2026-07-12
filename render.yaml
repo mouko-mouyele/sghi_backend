@@ -45,11 +45,10 @@ services:
       - key: WEB_CONCURRENCY
         value: "2"
 
-  # Application mobile Flutter (Web / PWA) — hébergement statique gratuit
+  # Application mobile Flutter (Web / PWA) — site statique (gratuit, pas de champ plan)
   - type: web
     name: sghi-mobile
     runtime: static
-    plan: free
     buildCommand: bash mobile/build_web.sh
     staticPublishPath: mobile/build/web
     envVars:
