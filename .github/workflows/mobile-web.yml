@@ -18,6 +18,8 @@ concurrency:
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
+    env:
+      KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD || 'SghlMobile2026!' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -25,6 +27,33 @@ jobs:
         with:
           channel: stable
           cache: true
+
+      - name: Cache Android release keystore
+        uses: actions/cache@v4
+        id: keystore-cache
+        with:
+          path: mobile/android/app/sghl-release.jks
+          key: sghl-release-keystore-v1
+
+      - name: Generate release keystore
+        if: steps.keystore-cache.outputs.cache-hit != 'true'
+        run: |
+          keytool -genkeypair -v \
+            -keystore mobile/android/app/sghl-release.jks \
+            -alias sghl \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -storepass "$KEYSTORE_PASSWORD" \
+            -keypass "$KEYSTORE_PASSWORD" \
+            -dname "CN=SGHL Mobile, O=SGHL, C=CM"
+
+      - name: Write Android signing config
+        run: |
+          cat > mobile/android/key.properties <<EOF
+          storePassword=$KEYSTORE_PASSWORD
+          keyPassword=$KEYSTORE_PASSWORD
+          keyAlias=sghl
+          storeFile=app/sghl-release.jks
+          EOF
 
       - name: Install dependencies
         run: cd mobile && flutter pub get
@@ -36,10 +65,11 @@ jobs:
             --base-href=/sghi_backend/ \
             --dart-define=SGHL_API_URL=https://sghi-backend.onrender.com/api/v1
 
-      - name: Build Android APK
+      - name: Build Android APK (arm64)
         run: |
           cd mobile
           flutter build apk --release \
+            --target-platform android-arm64 \
             --dart-define=SGHL_API_URL=https://sghi-backend.onrender.com/api/v1
 
       - name: Package APK for download
@@ -60,6 +90,11 @@ jobs:
           body: |
             Application Android SGHL Mobile (patient & médecin).
             API : https://sghi-backend.onrender.com/api/v1
+
+            Si l'installation échoue :
+            1. Désinstallez toute ancienne version « SGHL Mobile »
+            2. Paramètres → Applications → Chrome → « Installer des apps inconnues » → Autoriser
+            3. Retéléchargez l'APK (Wi-Fi recommandé)
           files: mobile/build/web/downloads/sghl-mobile.apk
           make_latest: true
 

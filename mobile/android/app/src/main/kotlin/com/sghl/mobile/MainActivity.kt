@@ -1,4 +1,4 @@
-package com.example.sghl_mobile
+package com.sghl.mobile
 
 import io.flutter.embedding.android.FlutterActivity
 

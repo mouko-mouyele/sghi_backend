@@ -43,6 +43,14 @@ Sur téléphone Android : ouvrez l'URL dans Chrome → bouton **Télécharger l'
 
 (Miroir Pages : `/downloads/sghl-mobile.apk` sur la même URL GitHub Pages.)
 
+### Erreur « Application non installée »
+
+1. **Désinstallez** toute ancienne version de SGHL Mobile (Paramètres → Applications).
+2. **Autorisez Chrome** à installer des apps : Paramètres → Applications → Chrome → *Installer des applications inconnues* → Autoriser.
+3. **Retéléchargez** l'APK (Wi-Fi recommandé, fichier ~25 Mo).
+4. Ouvrez le fichier depuis **Fichiers / Téléchargements**, pas seulement depuis la barre de notification.
+5. Si **Play Protect** bloque : Paramètres → Google → Play Protect → désactiver temporairement pour cette installation.
+
 Sur iPhone : **Ajouter à l'écran d'accueil** (PWA Web).
 
 ## Lancer dans Chrome (développement local)

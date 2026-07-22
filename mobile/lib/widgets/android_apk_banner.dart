@@ -47,8 +47,8 @@ class AndroidApkBanner extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            'Installez SGHL sur votre téléphone Android (APK officiel, ~15 Mo). '
-            'Autorisez « sources inconnues » si Android le demande.',
+            'Téléchargez SGHL Mobile (~25 Mo, Android 5.0+). '
+            'Après le téléchargement, ouvrez le fichier depuis « Fichiers » ou la notification Chrome.',
             style: TextStyle(fontSize: 12, color: Colors.green.shade900),
           ),
           const SizedBox(height: 10),
@@ -61,7 +61,27 @@ class AndroidApkBanner extends StatelessWidget {
               foregroundColor: Colors.white,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 10),
+          ExpansionTile(
+            tilePadding: EdgeInsets.zero,
+            title: Text(
+              '« Application non installée » ?',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: Colors.green.shade900,
+              ),
+            ),
+            children: [
+              Text(
+                '1. Désinstallez toute ancienne version SGHL Mobile\n'
+                '2. Paramètres → Applications → Chrome → Autoriser « sources inconnues »\n'
+                '3. Retéléchargez l\'APK (de préférence en Wi-Fi)\n'
+                '4. Si Play Protect bloque : Paramètres → Sécurité → Play Protect → désactiver temporairement',
+                style: TextStyle(fontSize: 11, color: Colors.green.shade900, height: 1.4),
+              ),
+            ],
+          ),
           Text(
             AppLinks.apkDownloadUrl,
             style: TextStyle(fontSize: 10, color: cs.outline),
