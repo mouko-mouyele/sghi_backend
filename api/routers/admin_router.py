@@ -47,6 +47,7 @@ from core.appointment_mail import (
 from core.audit import log_audit, snapshot
 from core.mfa_email import get_hospital_email, mask_email
 from core.sghi_mail import (
+    brevo_is_configured,
     email_diagnostic_message,
     email_is_configured,
     email_provider,
@@ -603,6 +604,7 @@ def admin_email_diagnostic(request):
     return EmailDiagnosticOut(
         configured=configured,
         provider=email_provider(),
+        brevo_key_set=brevo_is_configured(),
         smtp_host=settings.EMAIL_HOST,
         smtp_port=settings.EMAIL_PORT,
         smtp_user=(settings.EMAIL_HOST_USER or '').strip(),

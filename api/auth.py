@@ -184,9 +184,10 @@ def _create_mfa_challenge(user: User) -> dict:
             expires_at = _store_mfa_challenge(user, pending, code)
 
     if send_email:
-        dispatch_login_mfa_email(user, code)
+        email_ok, email_err = dispatch_login_mfa_email(user, code)
         sent_channel = channel
     else:
+        email_ok, email_err = True, ''
         sent_channel = channel
 
     hint = masked or mask_email(dest)
@@ -214,6 +215,7 @@ def _create_mfa_challenge(user: User) -> dict:
         'first_name': user.first_name,
         'last_name': user.last_name,
         'mfa_dev_code': '',
+        'mfa_email_error': '' if email_ok else (email_err or 'Email non envoyé'),
     }
     if getattr(settings, 'MFA_SHOW_CODE_ON_SCREEN', True) or settings.DEBUG:
         result['mfa_dev_code'] = code

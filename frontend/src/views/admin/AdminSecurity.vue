@@ -181,6 +181,7 @@ onMounted(() => {
         </p>
         <ul class="mt-2 space-y-1 text-xs text-slate-500 dark:text-slate-400">
           <li>Mode : {{ emailDiag.provider === 'brevo' ? 'API Brevo (HTTPS)' : emailDiag.provider === 'smtp' ? 'SMTP Gmail' : 'non configuré' }}</li>
+          <li>Clé BREVO_API_KEY : {{ emailDiag.brevo_key_set ? '✓ détectée sur Render' : '✗ absente — ajoutez-la dans Render → Environment' }}</li>
           <li v-if="emailDiag.render_smtp_blocked" class="text-amber-700 dark:text-amber-300">
             ⚠ Render gratuit bloque SMTP — ajoutez BREVO_API_KEY (gratuit sur brevo.com)
           </li>

@@ -42,6 +42,7 @@ class LoginResultOut(Schema):
     first_name: str = ''
     last_name: str = ''
     mfa_dev_code: str = ''  # code affiché à l'écran si MFA_SHOW_CODE_ON_SCREEN=True
+    mfa_email_error: str = ''  # erreur Brevo/SMTP si l'envoi a échoué
 
 
 class LoginMfaVerifyIn(Schema):
@@ -76,6 +77,7 @@ class MfaSetupOut(Schema):
 class EmailDiagnosticOut(Schema):
     configured: bool
     provider: str = 'none'
+    brevo_key_set: bool = False
     smtp_host: str
     smtp_port: int
     smtp_user: str

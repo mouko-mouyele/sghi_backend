@@ -2,7 +2,6 @@
 
 import logging
 import secrets
-from threading import Thread
 
 from django.conf import settings
 
@@ -63,13 +62,13 @@ def mask_email(email: str) -> str:
     return f'{masked_local}@{domain}'
 
 
-def send_login_mfa_code(user: User, code: str) -> tuple[bool, str, str]:
-    """Envoie le code MFA. Retourne (succès, email_dest, canal)."""
+def send_login_mfa_code(user: User, code: str) -> tuple[bool, str, str, str]:
+    """Envoie le code MFA. Retourne (succès, email_dest, canal, erreur)."""
     dest, channel, masked = mfa_destination_for_user(user)
     if not dest or '@' not in dest:
         if user.role == User.Role.PATIENT:
-            return False, '', 'personnel'
-        return False, '', 'hopital'
+            return False, '', 'personnel', 'Aucune adresse email patient enregistrée.'
+        return False, '', 'hopital', 'Boîte mail hôpital non configurée.'
 
     role_label = user.get_role_display() if hasattr(user, 'get_role_display') else user.role
     if channel == 'hopital':
@@ -104,28 +103,16 @@ def send_login_mfa_code(user: User, code: str) -> tuple[bool, str, str]:
         )
         print(preview)
         logger.info(preview)
-        return True, dest, channel
+        return True, dest, channel, 'BREVO_API_KEY absent sur Render — email simulé uniquement.'
 
     ok, err = send_sghi_email(subject, body, [dest])
     if not ok:
         logger.error('MFA email non livré à %s : %s', dest, err)
-        return False, dest, channel
-    return True, dest, channel
+        return False, dest, channel, err or 'Échec envoi email'
+    return True, dest, channel, ''
 
 
-def dispatch_login_mfa_email(user: User, code: str) -> None:
-    """Envoie le code MFA en arrière-plan — thread non-daemon pour Render/Gunicorn."""
-    def _run():
-        from django.db import close_old_connections
-
-        close_old_connections()
-        try:
-            ok, _, _ = send_login_mfa_code(user, code)
-            if not ok:
-                logger.error('MFA email non envoyé pour le compte %s', user.username)
-        except Exception:
-            logger.exception('Erreur thread envoi MFA pour %s', user.username)
-        finally:
-            close_old_connections()
-
-    Thread(target=_run, daemon=False, name=f'sghl-mfa-{user.pk}').start()
+def dispatch_login_mfa_email(user: User, code: str) -> tuple[bool, str]:
+    """Envoie le code MFA (synchrone — fiable sur Render/Gunicorn)."""
+    ok, _, _, err = send_login_mfa_code(user, code)
+    return ok, err
