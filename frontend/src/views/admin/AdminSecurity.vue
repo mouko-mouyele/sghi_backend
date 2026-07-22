@@ -180,11 +180,20 @@ onMounted(() => {
           {{ emailDiag.message }}
         </p>
         <ul class="mt-2 space-y-1 text-xs text-slate-500 dark:text-slate-400">
-          <li>Mode : {{ emailDiag.provider === 'brevo' ? 'API Brevo (HTTPS)' : emailDiag.provider === 'smtp' ? 'SMTP Gmail' : 'non configuré' }}</li>
-          <li>Clé BREVO_API_KEY : {{ emailDiag.brevo_key_set ? '✓ détectée sur Render' : '✗ absente — ajoutez-la dans Render → Environment' }}</li>
+          <li>Mode : {{
+            emailDiag.provider === 'gmail_api' ? 'Gmail API (inbox fiable)' :
+            emailDiag.provider === 'brevo' ? 'API Brevo (HTTPS)' :
+            emailDiag.provider === 'smtp' ? 'SMTP Gmail' : 'non configuré'
+          }}</li>
+          <li v-if="emailDiag.gmail_api_set">
+            Gmail API : {{ emailDiag.gmail_api_valid ? '✓ connectée' : '✗ token invalide — regénérez GMAIL_REFRESH_TOKEN' }}
+          </li>
+          <li v-else class="text-amber-700 dark:text-amber-300">
+            Gmail API non configurée — ajoutez GMAIL_CLIENT_ID, GMAIL_CLIENT_SECRET, GMAIL_REFRESH_TOKEN sur Render (voir guide ci-dessous)
+          </li>
+          <li>Clé BREVO_API_KEY : {{ emailDiag.brevo_key_set ? '✓ détectée (secours)' : '✗ absente' }}</li>
           <li v-if="emailDiag.brevo_key_set">
-            Validation Brevo :
-            {{ emailDiag.brevo_key_valid ? '✓ clé API valide (xkeysib-)' : '✗ clé refusée ou mauvaise (utilisez xkeysib-, pas xsmtpsib-)' }}
+            Brevo : {{ emailDiag.brevo_key_valid ? '✓ clé valide' : '✗ clé refusée' }}
           </li>
           <li v-if="emailDiag.render_smtp_blocked" class="text-amber-700 dark:text-amber-300">
             ⚠ Render gratuit bloque SMTP — ajoutez BREVO_API_KEY (gratuit sur brevo.com)
@@ -203,6 +212,15 @@ onMounted(() => {
         </button>
         <p v-if="emailTestMsg" class="mt-3 text-sm text-emerald-700 dark:text-emerald-300">{{ emailTestMsg }}</p>
         <p v-if="emailTestError" class="mt-3 text-sm text-red-600 dark:text-red-400">{{ emailTestError }}</p>
+        <div class="mt-4 rounded-lg bg-slate-50 p-3 text-xs text-slate-600 dark:bg-slate-900 dark:text-slate-400">
+          <p class="font-semibold text-slate-800 dark:text-slate-200">Recevoir les emails dans Gmail (recommandé)</p>
+          <p class="mt-1">Brevo seul envoie souvent en spam avec @gmail.com. Configurez aussi Gmail API :</p>
+          <ol class="mt-2 list-decimal space-y-1 pl-4">
+            <li>Google Cloud → activer <strong>Gmail API</strong> → créer identifiants OAuth</li>
+            <li><a class="text-primary-600 underline" href="https://developers.google.com/oauthplayground" target="_blank" rel="noopener">OAuth Playground</a> → scope <code>https://mail.google.com/</code></li>
+            <li>Render → ajouter <code>GMAIL_CLIENT_ID</code>, <code>GMAIL_CLIENT_SECRET</code>, <code>GMAIL_REFRESH_TOKEN</code></li>
+          </ol>
+        </div>
       </div>
 
     </div>

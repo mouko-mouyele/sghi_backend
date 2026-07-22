@@ -79,6 +79,8 @@ class EmailDiagnosticOut(Schema):
     provider: str = 'none'
     brevo_key_set: bool = False
     brevo_key_valid: bool = False
+    gmail_api_set: bool = False
+    gmail_api_valid: bool = False
     smtp_host: str
     smtp_port: int
     smtp_user: str
@@ -843,6 +845,8 @@ class HealthOut(Schema):
     email_provider: str = 'none'
     brevo_configured: bool = False
     brevo_key_valid: bool = False
+    gmail_api_configured: bool = False
+    gmail_api_valid: bool = False
 
 
 # ── Portail patient ───────────────────────────────────────────────────────────

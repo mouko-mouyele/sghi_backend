@@ -46,6 +46,7 @@ from core.appointment_mail import (
 )
 from core.audit import log_audit, snapshot
 from core.mfa_email import get_hospital_email, mask_email
+from core.gmail_api_mail import gmail_api_is_configured, verify_gmail_api
 from core.sghi_mail import (
     brevo_is_configured,
     brevo_key_format_ok,
@@ -606,11 +607,17 @@ def admin_email_diagnostic(request):
     brevo_valid = False
     if brevo_is_configured() and brevo_key_format_ok():
         brevo_valid, _ = verify_brevo_account()
+    gmail_set = gmail_api_is_configured()
+    gmail_valid = False
+    if gmail_set:
+        gmail_valid, _ = verify_gmail_api()
     return EmailDiagnosticOut(
         configured=configured,
         provider=email_provider(),
         brevo_key_set=brevo_is_configured(),
         brevo_key_valid=brevo_valid,
+        gmail_api_set=gmail_set,
+        gmail_api_valid=gmail_valid,
         smtp_host=settings.EMAIL_HOST,
         smtp_port=settings.EMAIL_PORT,
         smtp_user=(settings.EMAIL_HOST_USER or '').strip(),

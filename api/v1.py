@@ -26,6 +26,7 @@ from django.conf import settings
 
 from django.db import connection
 
+from core.gmail_api_mail import gmail_api_is_configured, verify_gmail_api
 from core.sghi_mail import brevo_is_configured, brevo_key_format_ok, email_provider, verify_brevo_account
 
 
@@ -53,21 +54,20 @@ def health_check(request):
     brevo_ok = False
     if brevo_is_configured() and brevo_key_format_ok():
         brevo_ok, _ = verify_brevo_account()
+    gmail_set = gmail_api_is_configured()
+    gmail_ok = False
+    if gmail_set:
+        gmail_ok, _ = verify_gmail_api()
 
     return {
-
         'status': 'healthy' if db_ok == 'ok' else 'degraded',
-
         'version': getattr(settings, 'API_VERSION', 'v1'),
-
         'database': db_ok,
-
         'email_provider': email_provider(),
-
         'brevo_configured': brevo_is_configured(),
-
         'brevo_key_valid': brevo_ok,
-
+        'gmail_api_configured': gmail_set,
+        'gmail_api_valid': gmail_ok,
     }
 
 

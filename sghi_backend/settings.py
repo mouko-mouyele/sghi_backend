@@ -180,6 +180,10 @@ def _clean_env_secret(name: str, default: str = '') -> str:
 
 BREVO_API_KEY = _clean_env_secret('BREVO_API_KEY')
 BREVO_SENDER_ID = config('BREVO_SENDER_ID', default='').strip()
+# Gmail API (HTTPS) — livraison fiable inbox Gmail sur Render gratuit
+GMAIL_CLIENT_ID = _clean_env_secret('GMAIL_CLIENT_ID')
+GMAIL_CLIENT_SECRET = _clean_env_secret('GMAIL_CLIENT_SECRET')
+GMAIL_REFRESH_TOKEN = _clean_env_secret('GMAIL_REFRESH_TOKEN')
 MFA_HOSPITAL_EMAIL = config('MFA_HOSPITAL_EMAIL', default='').strip()
 EMAIL_TIMEOUT = config('EMAIL_TIMEOUT', default=15, cast=int)
 # Afficher le code MFA à l'écran (en plus de l'email) pour saisie rapide

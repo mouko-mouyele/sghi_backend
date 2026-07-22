@@ -9,6 +9,8 @@ from email.utils import formataddr
 from django.conf import settings
 from django.core.mail import EmailMessage, get_connection
 
+from core.gmail_api_mail import gmail_api_is_configured, send_via_gmail_api, verify_gmail_api
+
 logger = logging.getLogger(__name__)
 
 BREVO_API_URL = 'https://api.brevo.com/v3/smtp/email'
@@ -58,10 +60,12 @@ def smtp_is_configured() -> bool:
 
 
 def email_is_configured() -> bool:
-    return brevo_is_configured() or smtp_is_configured()
+    return gmail_api_is_configured() or brevo_is_configured() or smtp_is_configured()
 
 
 def email_provider() -> str:
+    if gmail_api_is_configured():
+        return 'gmail_api'
     if brevo_is_configured():
         return 'brevo'
     if smtp_is_configured():
@@ -70,7 +74,7 @@ def email_provider() -> str:
 
 
 def render_smtp_likely_blocked() -> bool:
-    return bool(os.environ.get('RENDER')) and not brevo_is_configured()
+    return bool(os.environ.get('RENDER')) and not (gmail_api_is_configured() or brevo_is_configured())
 
 
 def verify_brevo_account() -> tuple[bool, str]:
@@ -104,6 +108,11 @@ def verify_brevo_account() -> tuple[bool, str]:
 
 
 def email_diagnostic_message() -> str:
+    if gmail_api_is_configured():
+        ok, detail = verify_gmail_api()
+        if ok:
+            return f'{detail} — recommandé pour recevoir les emails dans Gmail.'
+        return detail
     if brevo_is_configured():
         if not brevo_key_format_ok():
             return (
@@ -255,6 +264,20 @@ def send_sghi_email(subject: str, body: str, to: list[str]) -> tuple[bool, str]:
     recipients = [e.strip() for e in to if e and '@' in e]
     if not recipients:
         return False, 'Aucun destinataire valide'
+
+    sender = sghi_from_email()
+
+    if gmail_api_is_configured():
+        ok, err = send_via_gmail_api(subject, body, recipients, sender)
+        if ok:
+            return True, ''
+        if brevo_is_configured():
+            logger.warning('Gmail API échoué (%s) — repli Brevo', err)
+            brevo_ok, brevo_err = _send_via_brevo(subject, body, recipients)
+            if brevo_ok:
+                return True, ''
+            return False, f'Gmail: {err} | Brevo: {brevo_err}'
+        return False, err
 
     if brevo_is_configured():
         return _send_via_brevo(subject, body, recipients)
