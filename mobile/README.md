@@ -43,13 +43,13 @@ Sur téléphone Android : ouvrez l'URL dans Chrome → bouton **Télécharger l'
 
 (Miroir Pages : `/downloads/sghl-mobile.apk` sur la même URL GitHub Pages.)
 
-### Erreur « Application non installée »
+### Erreur « Application non installée » (Infinix Smart, Tecno, etc.)
 
 1. **Désinstallez** toute ancienne version de SGHL Mobile (Paramètres → Applications).
-2. **Autorisez Chrome** à installer des apps : Paramètres → Applications → Chrome → *Installer des applications inconnues* → Autoriser.
-3. **Retéléchargez** l'APK (Wi-Fi recommandé, fichier ~25 Mo).
-4. Ouvrez le fichier depuis **Fichiers / Téléchargements**, pas seulement depuis la barre de notification.
-5. Si **Play Protect** bloque : Paramètres → Google → Play Protect → désactiver temporairement pour cette installation.
+2. **Infinix XOS** : Paramètres → **Confidentialité** → *Autoriser l'installation d'applications de sources inconnues* → activez pour **Chrome** et **Fichiers**.
+3. **Phone Master / XSecurity** : ouvrez l'app → Sécurité → désactivez temporairement le scan à l'installation.
+4. **Retéléchargez** l'APK en Wi-Fi (~35 Mo), puis ouvrez-le depuis **Fichiers / Téléchargements** (pas seulement la notification).
+5. Si **Play Protect** bloque : Paramètres → Google → Play Protect → désactiver temporairement.
 
 Sur iPhone : **Ajouter à l'écran d'accueil** (PWA Web).
 

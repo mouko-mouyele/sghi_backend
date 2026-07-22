@@ -47,8 +47,8 @@ class AndroidApkBanner extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            'Téléchargez SGHL Mobile (~25 Mo, Android 5.0+). '
-            'Après le téléchargement, ouvrez le fichier depuis « Fichiers » ou la notification Chrome.',
+            'Téléchargez SGHL Mobile (~35 Mo, Android 5.0+). '
+            'Compatible Infinix Smart et autres téléphones Android.',
             style: TextStyle(fontSize: 12, color: Colors.green.shade900),
           ),
           const SizedBox(height: 10),
@@ -75,9 +75,11 @@ class AndroidApkBanner extends StatelessWidget {
             children: [
               Text(
                 '1. Désinstallez toute ancienne version SGHL Mobile\n'
-                '2. Paramètres → Applications → Chrome → Autoriser « sources inconnues »\n'
-                '3. Retéléchargez l\'APK (de préférence en Wi-Fi)\n'
-                '4. Si Play Protect bloque : Paramètres → Sécurité → Play Protect → désactiver temporairement',
+                '2. Infinix (XOS) : Paramètres → Confidentialité → '
+                'Autoriser l\'installation d\'apps de sources inconnues → Chrome + Fichiers\n'
+                '3. Désactivez temporairement Phone Master / XSecurity si l\'install est bloquée\n'
+                '4. Retéléchargez l\'APK en Wi-Fi, puis ouvrez-le depuis l\'app Fichiers\n'
+                '5. Play Protect : Paramètres → Google → Play Protect → désactiver temporairement',
                 style: TextStyle(fontSize: 11, color: Colors.green.shade900, height: 1.4),
               ),
             ],

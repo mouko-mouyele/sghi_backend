@@ -65,11 +65,11 @@ jobs:
             --base-href=/sghi_backend/ \
             --dart-define=SGHL_API_URL=https://sghi-backend.onrender.com/api/v1
 
-      - name: Build Android APK (arm64)
+      - name: Build Android APK (32-bit + 64-bit, Infinix / budget phones)
         run: |
           cd mobile
           flutter build apk --release \
-            --target-platform android-arm64 \
+            --target-platform android-arm,android-arm64 \
             --dart-define=SGHL_API_URL=https://sghi-backend.onrender.com/api/v1
 
       - name: Package APK for download
