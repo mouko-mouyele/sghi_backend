@@ -102,7 +102,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
               border: OutlineInputBorder(),
             ),
           ),          const SizedBox(height: 12),
-          TextField(controller: _form['password'] as TextEditingController, obscureText: true, decoration: const InputDecoration(labelText: 'Mot de passe (10+ car.)', border: OutlineInputBorder())),
+          TextField(
+            controller: _form['password'] as TextEditingController,
+            obscureText: true,
+            decoration: const InputDecoration(
+              labelText: 'Mot de passe (10+ car.)',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _form['passwordConfirm'] as TextEditingController,
+            obscureText: true,
+            decoration: const InputDecoration(
+              labelText: 'Confirmer le mot de passe',
+              border: OutlineInputBorder(),
+            ),
+          ),
           const SizedBox(height: 12),
           TextField(controller: _form['date_naissance'] as TextEditingController, decoration: const InputDecoration(labelText: 'Date naissance (AAAA-MM-JJ)', border: OutlineInputBorder())),
           const SizedBox(height: 12),

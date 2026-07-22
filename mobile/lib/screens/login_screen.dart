@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:ui' show FontFeature;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import '../widgets/android_apk_banner.dart';
 import '../services/api_service.dart';
 import 'patient_home_screen.dart';
 import 'doctor_home_screen.dart';
@@ -223,7 +225,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: Text(
                             _serverOk!
                                 ? 'Serveur connecté'
-                                : 'Serveur arrêté — lancez python manage.py runserver',
+                                : (kIsWeb
+                                    ? 'Serveur indisponible — attendez 30 s (Render) puis réessayez'
+                                    : 'Serveur arrêté — lancez python manage.py runserver'),
                             style: TextStyle(
                               fontSize: 12,
                               color: _serverOk! ? Colors.green.shade700 : Colors.red.shade700,
@@ -236,6 +240,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   ],
                   const SizedBox(height: 28),
                   if (!_mfaStep) ...[
+                    const AndroidApkBanner(),
+                    const SizedBox(height: 20),
                     Text('Je me connecte en tant que', style: Theme.of(context).textTheme.labelLarge),
                     const SizedBox(height: 10),
                     SegmentedButton<LoginProfile>(

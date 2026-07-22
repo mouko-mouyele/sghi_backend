@@ -26,13 +26,27 @@ jobs:
           channel: stable
           cache: true
 
+      - name: Install dependencies
+        run: cd mobile && flutter pub get
+
       - name: Build Flutter Web
         run: |
           cd mobile
-          flutter pub get
           flutter build web --release \
             --base-href=/sghi_backend/ \
             --dart-define=SGHL_API_URL=https://sghi-backend.onrender.com/api/v1
+
+      - name: Build Android APK
+        run: |
+          cd mobile
+          flutter build apk --release \
+            --dart-define=SGHL_API_URL=https://sghi-backend.onrender.com/api/v1
+
+      - name: Package APK for download
+        run: |
+          mkdir -p mobile/build/web/downloads
+          cp mobile/build/app/outputs/flutter-apk/app-release.apk mobile/build/web/downloads/sghl-mobile.apk
+          ls -lh mobile/build/web/downloads/
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
