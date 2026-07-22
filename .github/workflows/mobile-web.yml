@@ -46,7 +46,22 @@ jobs:
         run: |
           mkdir -p mobile/build/web/downloads
           cp mobile/build/app/outputs/flutter-apk/app-release.apk mobile/build/web/downloads/sghl-mobile.apk
+          touch mobile/build/web/.nojekyll
           ls -lh mobile/build/web/downloads/
+
+      - name: Remove previous mobile-apk release tag
+        run: git push origin :refs/tags/mobile-apk || true
+
+      - name: Publish APK to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: mobile-apk
+          name: SGHL Mobile — APK Android
+          body: |
+            Application Android SGHL Mobile (patient & médecin).
+            API : https://sghi-backend.onrender.com/api/v1
+          files: mobile/build/web/downloads/sghl-mobile.apk
+          make_latest: true
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4

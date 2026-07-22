@@ -39,7 +39,9 @@ bash build_web.sh
 
 Sur téléphone Android : ouvrez l'URL dans Chrome → bouton **Télécharger l'APK Android** sur l'écran de connexion.
 
-**APK direct** : [https://mouko-mouyele.github.io/sghi_backend/downloads/sghl-mobile.apk](https://mouko-mouyele.github.io/sghi_backend/downloads/sghl-mobile.apk)
+**APK direct** : [https://github.com/mouko-mouyele/sghi_backend/releases/download/mobile-apk/sghl-mobile.apk](https://github.com/mouko-mouyele/sghi_backend/releases/download/mobile-apk/sghl-mobile.apk)
+
+(Miroir Pages : `/downloads/sghl-mobile.apk` sur la même URL GitHub Pages.)
 
 Sur iPhone : **Ajouter à l'écran d'accueil** (PWA Web).
 
