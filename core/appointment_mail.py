@@ -2,9 +2,6 @@
 
 import logging
 
-from django.core.mail import send_mail
-from django.conf import settings
-
 from core.patient_mail import (
     format_datetime,
     secretary_emails,
@@ -34,10 +31,12 @@ def send_appointment_email(subject: str, body: str, recipients: list[str]) -> bo
 
     full_body = body.rstrip() + SIGNATURE
 
-    if not settings.EMAIL_HOST_USER:
+    from core.sghi_mail import email_is_configured, send_sghi_email
+
+    if not email_is_configured():
         preview = (
             f'\n{"=" * 60}\n'
-            f'[SGHL — Email simulé — configurez EMAIL_HOST_USER dans .env pour Gmail]\n'
+            f'[SGHL — Email simulé — configurez BREVO_API_KEY sur Render]\n'
             f'À : {", ".join(recipients)}\n'
             f'Objet : {subject}\n'
             f'{"-" * 60}\n'
@@ -48,18 +47,10 @@ def send_appointment_email(subject: str, body: str, recipients: list[str]) -> bo
         logger.info(preview)
         return True
 
-    try:
-        send_mail(
-            subject=subject,
-            message=full_body,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=recipients,
-            fail_silently=False,
-        )
-        return True
-    except Exception:
-        logger.exception('Échec envoi email RDV à %s', recipients)
-        return False
+    ok, err = send_sghi_email(subject, full_body, recipients)
+    if not ok:
+        logger.error('Échec envoi email RDV à %s : %s', recipients, err)
+    return ok
 
 
 def notify_appointment_pending(rdv) -> bool:

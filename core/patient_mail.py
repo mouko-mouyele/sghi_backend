@@ -3,7 +3,6 @@
 import logging
 
 from django.conf import settings
-from django.core.mail import send_mail
 from django.utils import timezone as dj_tz
 
 from accounts.models import User
@@ -49,10 +48,12 @@ def send_patient_email(subject: str, body: str, patient, *, extra_recipients: li
 
     full_body = body.rstrip() + SIGNATURE
 
-    if not settings.EMAIL_HOST_USER:
+    from core.sghi_mail import email_is_configured, send_sghi_email
+
+    if not email_is_configured():
         preview = (
             f'\n{"=" * 60}\n'
-            f'[SGHL — Email patient simulé — configurez EMAIL_HOST_USER dans .env]\n'
+            f'[SGHL — Email patient simulé — configurez BREVO_API_KEY sur Render]\n'
             f'À : {", ".join(recipients)}\n'
             f'Objet : {subject}\n'
             f'{"-" * 60}\n'
@@ -63,18 +64,10 @@ def send_patient_email(subject: str, body: str, patient, *, extra_recipients: li
         logger.info(preview)
         return True
 
-    try:
-        send_mail(
-            subject=subject,
-            message=full_body,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=recipients,
-            fail_silently=False,
-        )
-        return True
-    except Exception:
-        logger.exception('Échec envoi email patient à %s', recipients)
-        return False
+    ok, err = send_sghi_email(subject, full_body, recipients)
+    if not ok:
+        logger.error('Échec envoi email patient à %s : %s', recipients, err)
+    return ok
 
 
 def _greeting(patient) -> str:

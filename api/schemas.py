@@ -78,6 +78,7 @@ class EmailDiagnosticOut(Schema):
     configured: bool
     provider: str = 'none'
     brevo_key_set: bool = False
+    brevo_key_valid: bool = False
     smtp_host: str
     smtp_port: int
     smtp_user: str
@@ -839,6 +840,9 @@ class HealthOut(Schema):
     status: str
     version: str
     database: str
+    email_provider: str = 'none'
+    brevo_configured: bool = False
+    brevo_key_valid: bool = False
 
 
 # ── Portail patient ───────────────────────────────────────────────────────────

@@ -173,7 +173,13 @@ EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='').strip()
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='').replace(' ', '')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='SGHL <noreply@sghl.local>')
 # API Brevo (HTTPS) — fonctionne sur Render gratuit (SMTP port 587 bloqué)
-BREVO_API_KEY = config('BREVO_API_KEY', default='').strip()
+def _clean_env_secret(name: str, default: str = '') -> str:
+    raw = config(name, default=default)
+    return (raw or '').strip().strip('"').strip("'").replace('\n', '').replace('\r', '')
+
+
+BREVO_API_KEY = _clean_env_secret('BREVO_API_KEY')
+BREVO_SENDER_ID = config('BREVO_SENDER_ID', default='').strip()
 MFA_HOSPITAL_EMAIL = config('MFA_HOSPITAL_EMAIL', default='').strip()
 EMAIL_TIMEOUT = config('EMAIL_TIMEOUT', default=15, cast=int)
 # Afficher le code MFA à l'écran (en plus de l'email) pour saisie rapide

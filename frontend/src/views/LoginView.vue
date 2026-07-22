@@ -41,6 +41,7 @@ const mfaStep = ref(false)
 
 const mfaHint = ref('')
 const mfaDevCode = ref('')
+const mfaEmailError = ref('')
 const mfaExpired = ref(false)
 
 const mfaSecondsLeft = ref(0)
@@ -150,6 +151,7 @@ async function handleLogin() {
       pendingToken.value = data.pending_token
       mfaHint.value = data.mfa_hint || `Code envoyé à ${data.mfa_sent_to || 'votre email'}`
       mfaDevCode.value = data.mfa_dev_code || ''
+      mfaEmailError.value = data.mfa_email_error || ''
       mfaStep.value = true
       mfaCode.value = ''
       startMfaTimer(data.mfa_expires_in || 300, data.mfa_expires_at)
@@ -224,6 +226,7 @@ function backToPassword() {
   mfaCode.value = ''
 
   mfaDevCode.value = ''
+  mfaEmailError.value = ''
   mfaSecondsLeft.value = 0
 
   error.value = ''
@@ -336,11 +339,12 @@ function backToPassword() {
             </button>
           </div>
 
+          <div v-if="mfaEmailError" class="rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-100">
+            Email non envoyé : {{ mfaEmailError }}
+            <span v-if="mfaDevCode"> — utilisez le code affiché ci-dessus.</span>
+          </div>
+
           <div
-
-            class="rounded-xl px-4 py-3 text-center text-sm font-medium"
-
-            :class="mfaExpired
 
               ? 'bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-300'
 

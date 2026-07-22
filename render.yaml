@@ -42,6 +42,8 @@ services:
         sync: false
       - key: BREVO_API_KEY
         sync: false
+      - key: BREVO_SENDER_ID
+        sync: false
       - key: DEFAULT_FROM_EMAIL
         value: moukomoise745@gmail.com
       - key: WEB_CONCURRENCY
