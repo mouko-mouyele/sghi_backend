@@ -345,15 +345,12 @@ function backToPassword() {
           </div>
 
           <div
-
+            class="rounded-xl px-4 py-3 text-center text-sm font-medium"
+            :class="mfaExpired
               ? 'bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-300'
-
               : mfaSecondsLeft <= 60
-
                 ? 'bg-amber-50 text-amber-800 dark:bg-amber-950/40 dark:text-amber-200'
-
                 : 'bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200'"
-
           >
 
             <template v-if="mfaExpired">Code expiré — reconnectez-vous</template>
