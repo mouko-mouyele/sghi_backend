@@ -8,7 +8,7 @@ from django.conf import settings
 
 from accounts.models import User
 from core.models import HospitalInfo
-from core.sghi_mail import send_sghi_email
+from core.sghi_mail import email_is_configured, send_sghi_email
 
 logger = logging.getLogger(__name__)
 
@@ -93,7 +93,7 @@ def send_login_mfa_code(user: User, code: str) -> tuple[bool, str, str]:
 
     body = intro
 
-    if not settings.EMAIL_HOST_USER:
+    if not email_is_configured():
         preview = (
             f'\n{"=" * 60}\n'
             f'[SGHL — MFA email simulé]\n'

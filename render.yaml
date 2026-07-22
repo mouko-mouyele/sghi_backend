@@ -40,6 +40,8 @@ services:
         value: moukomoise745@gmail.com
       - key: EMAIL_HOST_PASSWORD
         sync: false
+      - key: BREVO_API_KEY
+        sync: false
       - key: DEFAULT_FROM_EMAIL
         value: moukomoise745@gmail.com
       - key: WEB_CONCURRENCY

@@ -46,7 +46,14 @@ from core.appointment_mail import (
 )
 from core.audit import log_audit, snapshot
 from core.mfa_email import get_hospital_email, mask_email
-from core.sghi_mail import email_is_configured, send_sghi_email, sghi_from_email
+from core.sghi_mail import (
+    email_diagnostic_message,
+    email_is_configured,
+    email_provider,
+    render_smtp_likely_blocked,
+    send_sghi_email,
+    sghi_from_email,
+)
 from core.middleware import get_audit_meta
 from core.models import HospitalInfo
 from core.pdf import generate_admin_stats_pdf
@@ -593,23 +600,17 @@ def admin_email_diagnostic(request):
     hospital = get_hospital_email()
     pwd_set = bool((getattr(settings, 'EMAIL_HOST_PASSWORD', '') or '').strip())
     configured = email_is_configured()
-    if configured:
-        msg = 'SMTP Gmail configuré — utilisez « Tester l\'envoi » pour valider la réception.'
-    elif not (settings.EMAIL_HOST_USER or '').strip():
-        msg = 'EMAIL_HOST_USER manquant dans Render → Environment.'
-    elif not pwd_set:
-        msg = 'EMAIL_HOST_PASSWORD manquant — ajoutez le mot de passe d\'application Gmail dans Render.'
-    else:
-        msg = 'Configuration email incomplète.'
     return EmailDiagnosticOut(
         configured=configured,
+        provider=email_provider(),
         smtp_host=settings.EMAIL_HOST,
         smtp_port=settings.EMAIL_PORT,
         smtp_user=(settings.EMAIL_HOST_USER or '').strip(),
         from_email=sghi_from_email(),
         hospital_email=hospital or '',
         password_set=pwd_set,
-        message=msg,
+        render_smtp_blocked=render_smtp_likely_blocked(),
+        message=email_diagnostic_message(),
     )
 
 

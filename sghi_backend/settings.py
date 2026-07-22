@@ -172,6 +172,8 @@ EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='').strip()
 # Gmail : mot de passe d'application — espaces ignorés (ex. "abcd efgh …")
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='').replace(' ', '')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='SGHL <noreply@sghl.local>')
+# API Brevo (HTTPS) — fonctionne sur Render gratuit (SMTP port 587 bloqué)
+BREVO_API_KEY = config('BREVO_API_KEY', default='').strip()
 MFA_HOSPITAL_EMAIL = config('MFA_HOSPITAL_EMAIL', default='').strip()
 EMAIL_TIMEOUT = config('EMAIL_TIMEOUT', default=15, cast=int)
 # Afficher le code MFA à l'écran (en plus de l'email) pour saisie rapide

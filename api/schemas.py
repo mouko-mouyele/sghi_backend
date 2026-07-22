@@ -75,12 +75,14 @@ class MfaSetupOut(Schema):
 
 class EmailDiagnosticOut(Schema):
     configured: bool
+    provider: str = 'none'
     smtp_host: str
     smtp_port: int
     smtp_user: str
     from_email: str
     hospital_email: str
     password_set: bool
+    render_smtp_blocked: bool = False
     message: str
 
 

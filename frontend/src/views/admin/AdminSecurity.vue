@@ -175,14 +175,18 @@ onMounted(() => {
       </div>
 
       <div v-if="emailDiag" class="mt-4 rounded-xl border border-slate-200 p-4 dark:border-slate-600">
-        <p class="text-sm font-medium text-slate-800 dark:text-slate-100">Configuration SMTP (Gmail)</p>
-        <p class="mt-1 text-xs" :class="emailDiag.configured ? 'text-emerald-600' : 'text-amber-700 dark:text-amber-300'">
+        <p class="text-sm font-medium text-slate-800 dark:text-slate-100">Configuration email</p>
+        <p class="mt-1 text-xs" :class="emailDiag.configured && !emailDiag.render_smtp_blocked ? 'text-emerald-600' : 'text-amber-700 dark:text-amber-300'">
           {{ emailDiag.message }}
         </p>
         <ul class="mt-2 space-y-1 text-xs text-slate-500 dark:text-slate-400">
-          <li>Serveur : {{ emailDiag.smtp_host }}:{{ emailDiag.smtp_port }}</li>
-          <li>Compte : {{ emailDiag.smtp_user || '—' }}</li>
-          <li>Mot de passe app : {{ emailDiag.password_set ? '✓ configuré' : '✗ manquant dans Render' }}</li>
+          <li>Mode : {{ emailDiag.provider === 'brevo' ? 'API Brevo (HTTPS)' : emailDiag.provider === 'smtp' ? 'SMTP Gmail' : 'non configuré' }}</li>
+          <li v-if="emailDiag.render_smtp_blocked" class="text-amber-700 dark:text-amber-300">
+            ⚠ Render gratuit bloque SMTP — ajoutez BREVO_API_KEY (gratuit sur brevo.com)
+          </li>
+          <li v-if="emailDiag.provider === 'smtp'">Serveur : {{ emailDiag.smtp_host }}:{{ emailDiag.smtp_port }}</li>
+          <li>Compte expéditeur : {{ emailDiag.smtp_user || '—' }}</li>
+          <li v-if="emailDiag.provider === 'smtp'">Mot de passe app Gmail : {{ emailDiag.password_set ? '✓ configuré' : '✗ manquant' }}</li>
         </ul>
         <button
           type="button"
