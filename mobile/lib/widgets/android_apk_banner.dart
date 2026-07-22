@@ -47,8 +47,8 @@ class AndroidApkBanner extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            'Téléchargez SGHL Mobile (~35 Mo, Android 5.0+). '
-            'Compatible Infinix Smart et autres téléphones Android.',
+            'Téléchargez SGHL Mobile (~45 Mo). '
+            'Le fichier doit faire environ 45 Mo — si vous voyez ~53 Mo, retéléchargez (ancienne version).',
             style: TextStyle(fontSize: 12, color: Colors.green.shade900),
           ),
           const SizedBox(height: 10),

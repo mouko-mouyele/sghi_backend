@@ -54,6 +54,7 @@ jobs:
           keyAlias=sghl
           storeFile=app/sghl-release.jks
           EOF
+          ls -lh mobile/android/app/sghl-release.jks
 
       - name: Install dependencies
         run: cd mobile && flutter pub get
@@ -65,12 +66,19 @@ jobs:
             --base-href=/sghi_backend/ \
             --dart-define=SGHL_API_URL=https://sghi-backend.onrender.com/api/v1
 
-      - name: Build Android APK (32-bit + 64-bit, Infinix / budget phones)
+      - name: Build Android APK (universal)
         run: |
           cd mobile
           flutter build apk --release \
-            --target-platform android-arm,android-arm64 \
             --dart-define=SGHL_API_URL=https://sghi-backend.onrender.com/api/v1
+
+      - name: Verify APK signature
+        run: |
+          APK="mobile/build/app/outputs/flutter-apk/app-release.apk"
+          ls -lh "$APK"
+          unzip -l "$APK" | grep -E "lib/(armeabi-v7a|arm64-v8a)/libflutter.so"
+          APKSIGNER="$(find "${ANDROID_HOME}/build-tools" -name apksigner | sort -V | tail -1)"
+          "$APKSIGNER" verify --verbose "$APK"
 
       - name: Package APK for download
         run: |
@@ -79,24 +87,24 @@ jobs:
           touch mobile/build/web/.nojekyll
           ls -lh mobile/build/web/downloads/
 
-      - name: Remove previous mobile-apk release tag
-        run: git push origin :refs/tags/mobile-apk || true
-
       - name: Publish APK to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: mobile-apk
-          name: SGHL Mobile — APK Android
+          name: SGHL Mobile — APK Android (v1.0.3)
           body: |
             Application Android SGHL Mobile (patient & médecin).
+            Compatible Infinix Smart 6, Tecno, Samsung, etc.
             API : https://sghi-backend.onrender.com/api/v1
 
-            Si l'installation échoue :
-            1. Désinstallez toute ancienne version « SGHL Mobile »
-            2. Paramètres → Applications → Chrome → « Installer des apps inconnues » → Autoriser
-            3. Retéléchargez l'APK (Wi-Fi recommandé)
+            Infinix Smart 6 (XOS 7.6) :
+            1. Désinstallez toute ancienne version SGHL Mobile
+            2. Paramètres → Confidentialité → sources inconnues → Chrome + Fichiers
+            3. Phone Master → désactiver scan installation
+            4. Retéléchargez ce fichier (~45 Mo) en Wi-Fi
           files: mobile/build/web/downloads/sghl-mobile.apk
           make_latest: true
+          overwrite_files: true
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
